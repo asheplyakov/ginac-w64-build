@@ -148,14 +148,12 @@ different compilers (see e.g.
 How do I compile ${GiNaC} with Visual C++?<br>
 <b>A:</b> 
 I can't give a definitive answer, since I don't use that compiler myself.
-Anyway, there's (at least) two things you should do. First of all,
-the ${CLN} library contains a bit of GCC
-specific code. You need to identify compiler specific code, and rewrite
-it in a (reasonably) portable manner. You might want to send patches to
-the ${CLN_MailList}, so you don't need to do this boring work whenever
-a new version of ${CLN} is released.
-The suggestions below can greatly increase the chances of your changes
-being accepted:
+Anyway, the ${CLN} library contains a bit of GCC specific code. You need
+to identify compiler specific code, and rewrite it in a (reasonably)
+portable manner. You might want to send patches to the ${CLN_MailList},
+so you don't need to do this boring work whenever a new version of ${CLN}
+is released. The suggestions below can greatly increase the chances of
+your changes being accepted:
 <ul style="list-style-type: square; display: inline-block;">
     <li> Describe your changes: explain what problem you are trying solve,
          what are you doing to solve it, and why are you taking a particular
@@ -173,18 +171,7 @@ being accepted:
          it's absolutely necessary. </li>
     <li> Don't mix platform specific code with the generic one (put platform
          specific code into a different function, macros, file, etc). </li>
-    <li> Don't <b>replace</b>
-	 the <a href="http://en.wikipedia.org/wiki/GNU_build_system"
-	 >auto tools</a> based build system with something else.
-         That said, adding support for other build system(s) is welcome. </li>
 </ul>
-Secondly, you need to write build scripts for Visual C++ (or "project files",
-or whatever m$ calls them) for ${GiNaC} and ${CLN}. 
-<p>
-Last, but not least: <b>don't ask developers to do this work for you unless
-you are willing to pay for it</b>.
-</p>
-
 </div>
 </body>
 </html>
