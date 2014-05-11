@@ -161,22 +161,6 @@ define do_install
 $(call do_install_real,$(strip $(1)),$(strip $(2)),$(strip $(3)))
 endef
 
-define do_stow_install
-$(MAKE) -C $(BUILDDIR) install DESTDIR=$(STOWDIR) prefix=/$(PACKAGE)-$(VERSION) ; \
-rm -rf $(STOWDIR)/$(PACKAGE)-$(VERSION)/share/info ; 				\
-rm -rf $(STOWDIR)/$(PACKAGE)-$(VERSION)/share/man ;				\
-find $(STOWDIR)/$(PACKAGE)-$(VERSION) -type f -name '*.la' | xargs rm -f ; 	\
-stow --dir=$(STOWDIR) -D $(PACKAGE) || true ; 					\
-rm -f $(STOWDIR)/$(PACKAGE) ;							\
-ln -s $(PACKAGE)-$(VERSION) $(STOWDIR)/$(PACKAGE) ;				\
-stow --dir=$(STOWDIR) $(PACKAGE)
-endef
-define stow_install
-if [ -d $(STOWDIR) ]; then	\
-	$(do_stow_install) ; 	\
-fi
-endef
-
 define fixup_pc_files
 find $(1) -type f -name '*.pc' | xargs --no-run-if-empty -n1 sed -i -e 's%^prefix=.*$$%prefix=$(2)%g'
 endef
@@ -192,8 +176,6 @@ $(INSTALL_STAMP): $(CHECK_STAMP) $(EXTRA_INSTALLS)
 	# Yet another copy for all-in-one tarball, without debugging symbols
 	$(call do_install,-strip,$(GINAC_DESTDIR),$(GINAC_PREFIX))
 	$(call fixup_pc_files,$(GINAC_DESTDIR).stripped,$(GINAC_PREFIX))
-	# Install a copy into collection of woe32 libraries (managed by stow)
-	$(stow_install)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	touch $@
 

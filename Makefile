@@ -50,11 +50,8 @@ $(ALL_IN_ONE_TARBALLS:%=%.md5): %.md5: %
 	mv $@.tmp $@
 
 $(PACKAGES_STAMP): $(CONFIGURES)
-	stow --dir=$(MINGW_TARGET)/stow -D gmp || true
 	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION)
-	stow --dir=$(MINGW_TARGET)/stow -D cln || true
 	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION)
-	stow --dir=$(MINGW_TARGET)/stow -D ginac || true
 	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION)
 	touch $@
 
