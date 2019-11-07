@@ -4,17 +4,11 @@ PACKAGES := gmp cln ginac
 include versions.mk
 include conf/mingw.conf
 CONFIGURES := cln/configure ginac/configure
-MINGW_TARGET := $(HOME)/target/$(ARCH)
-BIN_TARBALLS := $(foreach pkg, $(PACKAGES), upload/$(pkg)-$($(pkg)_VERSION)-$(ARCH).tar.bz2)
-BIN_DBG_TARBALLS := $(BIN_TARBALLS:%.tar.bz2:%-dbg.tar.bz2)
-ALL_IN_ONE_PREFIX := /opt/$(ARCH)/ginac
-ALL_IN_ONE_TARBALL := upload/ginac-$(ginac_VERSION)-cln-$(cln_VERSION)-gmp-$(gmp_VERSION)-$(ARCH).tar.bz2 
-ALL_IN_ONE_TARBALL_DBG := $(ALL_IN_ONE_TARBALL:%.tar.bz2=%-dbg.tar.bz2)
-ALL_IN_ONE_TARBALLS := $(ALL_IN_ONE_TARBALL) $(ALL_IN_ONE_TARBALL_DBG)
-ALL_BIN_TARBALLS := $(BIN_TARBALLS) $(BIN_DBG_TARBALLS) $(ALL_IN_ONE_TARBALLS)
-$(info ALL_IN_ONE_TARBALLS = $(ALL_BIN_TARBALLS))
+PREFIX := /opt/$(ARCH)/ginac
+BIN_TARBALL := upload/ginac-$(ginac_VERSION)-cln-$(cln_VERSION)-gmp-$(gmp_VERSION)-$(ARCH).tar.bz2
+$(info BIN_TARBALL = $(BIN_TARBALL))
 RTFM := $(addprefix upload/,index.html vargs.css)
-MD5SUMS := $(ALL_BIN_TARBALLS:%=%.md5)
+MD5SUMS := $(BIN_TARBALL:%=%.md5)
 
 # FIXME: makeinfo fails due to wrong grep call in all locales except C
 LC_ALL := C
@@ -22,7 +16,7 @@ export LC_ALL
 
 all: upload
 
-upload: $(ALL_BIN_TARBALLS) $(MD5SUMS) $(RTFM)
+upload: $(BIN_TARBALL) $(MD5SUMS) $(RTFM)
 
 upload/index.html: doc/readme.html.x doc/readme.py
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
@@ -37,22 +31,17 @@ $(CONFIGURES): %/configure:
 
 PACKAGES_STAMP := build-tree/stamps/packages.stamp
 
-$(ALL_BIN_TARBALLS): $(PACKAGES_STAMP)
+$(BIN_TARBALL): $(PACKAGES_STAMP)
+	tar -cjf $@ -C build-tree/inst/all $(patsubst /%,%,$(PREFIX))
 
-$(ALL_IN_ONE_TARBALL): $(PACKAGES_STAMP)
-	tar -cjf $@ -C build-tree/inst/all.stripped $(patsubst /%,%,$(ALL_IN_ONE_PREFIX))
-
-$(ALL_IN_ONE_TARBALL_DBG): $(PACKAGES_STAMP)
-	tar -cjf $@ -C build-tree/inst/all $(patsubst /%,%,$(ALL_IN_ONE_PREFIX))
-
-$(ALL_IN_ONE_TARBALLS:%=%.md5): %.md5: %
+$(BIN_TARBALL:%=%.md5): %.md5: %
 	md5sum $< > $@.tmp
 	mv $@.tmp $@
 
 $(PACKAGES_STAMP): $(CONFIGURES)
-	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION)
-	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION)
-	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION)
+	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION) PREFIX=$(PREFIX)
+	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION) PREFIX=$(PREFIX)
+	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION) PREFIX=$(PREFIX)
 	touch $@
 
 clean:

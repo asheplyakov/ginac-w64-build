@@ -12,23 +12,8 @@ endif
 # Different distros call MinGW compiler in different ways
 include mingw.conf
 
-MINGW_TARGET := $(HOME)/target/$(ARCH)
-STOWDIR := $(MINGW_TARGET)/stow
-GINAC_PREFIX := /opt/$(ARCH)/ginac
-GINAC_DESTDIR := $(shell pwd)/../../build-tree/inst/all
-
-# What to build:
-BIN_TBZ := $(shell pwd)/../../upload/$(PACKAGE)-$(VERSION)-$(ARCH).tar.bz2
-BIN_DBG_TBZ := $(shell pwd)/../../upload/$(PACKAGE)-$(VERSION)-$(ARCH)-dbg.tar.bz2
-BIN_TARBALLS := $(BIN_TBZ) $(BIN_DBG_TBZ)
-MD5SUMS := $(BIN_TARBALLS:%=%.md5)
-GPG_SIGN :=
-ifneq (,$(GPGKEY))
-GPG_SIGN += $(BIN_TARBALLS:%=%.asc)
-endif
-
-all: $(BIN_TARBALLS) $(MD5SUMS) $(GPG_SIGN)
-
+PREFIX ?= /opt/$(ARCH)/ginac
+DESTDIR := $(shell pwd)/../../build-tree/inst/all
 
 # If the package is re-configured, make will try rebuild everything,
 # since the `config.h' file and friends have been re-generated. Use ccache(1)
@@ -63,9 +48,9 @@ CFLAGS := -O2 -g -Wall -pipe -march=i686
 CXXFLAGS := $(CFLAGS)
 CPPFLAGS :=
 LDFLAGS :=
-CPPFLAGS += -I$(GINAC_DESTDIR)$(GINAC_PREFIX)/include
-LDFLAGS += -L$(GINAC_DESTDIR)$(GINAC_PREFIX)/lib
-PKG_CONFIG_PATH := $(GINAC_DESTDIR)$(GINAC_PREFIX)/lib/pkgconfig
+CPPFLAGS += -I$(DESTDIR)$(PREFIX)/include
+LDFLAGS += -L$(DESTDIR)$(PREFIX)/lib
+PKG_CONFIG_PATH := $(DESTDIR)$(PREFIX)/lib/pkgconfig
 # XXX: In order to convince libtool to create a shared library one need to
 # pass the `-no-undefined' switch. The most straightforward way is to append
 # it to LDFLAGS. It should be noted that GCC has no idea what -no-undefined
@@ -78,12 +63,9 @@ EXTRA_LDFLAGS :=
 include $(PACKAGE)_cflags.mk
 export CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG_PATH
 
-PREFIX := /opt/$(ARCH)/$(PACKAGE)-$(VERSION)
 SRCDIR := $(shell pwd)/../../$(PACKAGE)
 BUILDDIR := $(shell pwd)/../../build-tree/build/$(PACKAGE)-$(VERSION)
-DESTDIR := $(shell pwd)/../../build-tree/inst/$(PACKAGE)-$(VERSION)
 STAMPDIR := $(shell pwd)/../../build-tree/stamps
-$(info DESTDIR $(DESTDIR))
 
 # Classical cross-compilation
 # XXX: configure script fails detect cross-compilation since we set up
@@ -106,7 +88,7 @@ endef
 
 define pkgconfig
 $(strip $(shell set -e; export PKG_CONFIG_PATH=$(PKG_CONFIG_PATH); \
-		pkg-config --define-variable=prefix=$(GINAC_DESTDIR)$(GINAC_PREFIX) $(1)))
+		pkg-config --define-variable=prefix=$(DESTDIR)$(PREFIX) $(1)))
 endef
 
 
@@ -120,6 +102,7 @@ BUILD_STAMP := $(STAMPDIR)/build.$(PACKAGE)-$(VERSION).stamp
 CHECK_STAMP := $(STAMPDIR)/check.$(PACKAGE)-$(VERSION).stamp
 INSTALL_STAMP := $(STAMPDIR)/install.$(PACKAGE)-$(VERSION).stamp
 
+all: install
 config: $(CONFIG_STAMP)
 build: $(BUILD_STAMP)
 check: $(CHECK_STAMP)
@@ -166,38 +149,14 @@ find $(1) -type f -name '*.pc' | xargs --no-run-if-empty -n1 sed -i -e 's%^prefi
 endef
 
 $(INSTALL_STAMP): $(CHECK_STAMP) $(EXTRA_INSTALLS)
-	# "Stand alone" installation
 	$(call do_install,,$(DESTDIR),$(PREFIX))
-	# "Stand alone" installation without debugging symbols
-	$(call do_install,-strip,$(DESTDIR),$(PREFIX))
-	# Another copy for all-in-one tarball
-	$(call do_install,,$(GINAC_DESTDIR),$(GINAC_PREFIX))
-	$(call fixup_pc_files,$(GINAC_DESTDIR),$(GINAC_PREFIX))
-	# Yet another copy for all-in-one tarball, without debugging symbols
-	$(call do_install,-strip,$(GINAC_DESTDIR),$(GINAC_PREFIX))
-	$(call fixup_pc_files,$(GINAC_DESTDIR).stripped,$(GINAC_PREFIX))
+	$(call fixup_pc_files,$(DESTDIR),$(PREFIX))
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	touch $@
 
-$(BIN_DBG_TBZ): $(INSTALL_STAMP)
-	mkdir -p $(dir $@)
-	tar -cjf $@ -C $(DESTDIR) $(patsubst /%, %, $(PREFIX))
-
-$(BIN_TBZ): $(INSTALL_STAMP)
-	mkdir -p $(dir $@)
-	tar -cjf $@ -C $(DESTDIR).stripped $(patsubst /%, %, $(PREFIX))
-
-$(GPG_SIGN): %.asc: %
-	gpg -a -b -s -u $(GPGKEY) -o $@ $<
-
-$(MD5SUMS): %.md5: %
-	md5sum $< > $@.tmp
-	sed -i -e 's/^\([0-9a-f]\+\)\([ \t]\+\).*[/]\([^/]\+\)$$/\1\2\3/g' $@.tmp
-	mv $@.tmp $@
-
 CLEANFILES := $(INSTALL_STAMP) $(CHECK_STAMP) $(BUILD_STAMP) $(CONFIG_STAMP)
-CLEANDIRS := $(BUILDDIR) $(DESTDIR) $(DESTDIR).stripped
-ALLCLEANFILES := $(CLEANFILES) $(MD5SUMS) $(GPG_SIGN) $(BIN_TARBALLS) 
+CLEANDIRS := $(BUILDDIR)
+ALLCLEANFILES := $(CLEANFILES)
 ALLCLEANDIRS := $(CLEANDIRS)
 
 clean:
