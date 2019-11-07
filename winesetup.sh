@@ -68,7 +68,7 @@ if [ -r "${mingw_conf}" ]; then
 	ARCH="$(sed -n -e 's/^ARCH[ \t]*[:]*[=][ \t]*\(.*\)$/\1/p' ${mingw_conf})"
 fi
 if [ -z "$ARCH" ]; then
-	ARCH="i686-w64-mingw32"
+	ARCH="x86_64-w64-mingw32"
 fi
 libgcc_file="`${ARCH}-gcc -print-libgcc-file-name`"
 runtime_dir="$(dirname $libgcc_file)"

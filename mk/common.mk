@@ -43,8 +43,8 @@ CONFIG_SHELL := /bin/bash
 PATH := $(MINGW_PREFIX)/bin:/bin:/usr/bin
 export SHELL CONFIG_SHELL PATH
 
-# Compile for generic pentium-compatible CPU.
-CFLAGS := -O2 -g -Wall -pipe -march=i686
+# Compile for generic x86_64 CPU
+CFLAGS := -O2 -g -Wall -pipe
 CXXFLAGS := $(CFLAGS)
 CPPFLAGS :=
 LDFLAGS :=
