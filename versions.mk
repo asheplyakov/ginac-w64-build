@@ -1,4 +1,4 @@
 
 gmp_VERSION := 5.1.3
 cln_VERSION := 1.3.4+20191107+git1a03695164eb
-ginac_VERSION := 1.6.2
+ginac_VERSION := 1.7.7
