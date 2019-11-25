@@ -9,7 +9,6 @@ TOPDIR := $(shell pwd)
 export TOPDIR
 PREFIX := /opt/$(ARCH)/ginac
 BIN_TARBALL := upload/ginac-$(ginac_VERSION)-cln-$(cln_VERSION)-gmp-$(gmp_VERSION)-$(ARCH).tar.bz2
-$(info BIN_TARBALL = $(BIN_TARBALL))
 RTFM := $(addprefix upload/,index.html vargs.css)
 MD5SUMS := $(BIN_TARBALL:%=%.md5)
 
@@ -35,16 +34,16 @@ $(CONFIGURES): %/configure:
 PACKAGES_STAMP := build-tree/stamps/packages.stamp
 
 $(BIN_TARBALL): $(PACKAGES_STAMP)
-	tar -cjf $@ -C build-tree/inst/all $(patsubst /%,%,$(PREFIX))
+	tar -cjf $@ -C $(DESTDIR) $(patsubst /%,%,$(PREFIX))
 
 $(BIN_TARBALL:%=%.md5): %.md5: %
 	md5sum $< > $@.tmp
 	mv $@.tmp $@
 
 $(PACKAGES_STAMP): $(CONFIGURES)
-	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION) PREFIX=$(PREFIX)
-	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION) PREFIX=$(PREFIX)
-	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION) PREFIX=$(PREFIX)
+	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 	touch $@
 
 clean:
@@ -54,6 +53,10 @@ allclean:
 	-@echo CLEAN build-tree; rm -rf build-tree
 	-@echo CLEAN cln; cd cln; git clean -d -f
 	-@echo CLEAN ginac; cd ginac; git clean -d -f
+
+
+print_destdir:
+	@/bin/echo -n $(DESTDIR)
 
 .PHONY: packages.stamp clean all upload
 

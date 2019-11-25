@@ -12,8 +12,7 @@ endif
 # Different distros call MinGW compiler in different ways
 include mingw.conf
 
-PREFIX ?= /opt/$(ARCH)/ginac
-DESTDIR := $(shell pwd)/../../build-tree/inst/all
+PREFIX ?= /opt/$(ARCH)
 
 # If the package is re-configured, make will try rebuild everything,
 # since the `config.h' file and friends have been re-generated. Use ccache(1)

@@ -55,7 +55,7 @@ wineconsole --backend=curses cmd /c exit >/dev/null 2>&1
 
 # Map the staging directory (${DESTDIR}${PREFIX}) as the wine drive X:
 if [ -z "${DESTDIR}" ]; then
-	DESTDIR="`pwd`/build-tree/inst/all"
+	DESTDIR="$(make -f Makefile print_destdir)"
 fi
 if [ -z "${prefix}" ]; then
 	prefix=/opt/ginac
