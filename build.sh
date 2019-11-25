@@ -21,4 +21,4 @@ if [ "${need_winesetup}" = "yes" ]; then
 	$(dirname $0)/winesetup.sh
 fi
 
-exec nice -n19 mispipe "make -j2 2>&1" "tee build.log"
+exec nice -n19 mispipe "make -j${J} 2>&1" "tee build.log"
