@@ -28,8 +28,12 @@ upload/index.html: doc/readme.html.x doc/readme.py
 upload/vargs.css: doc/vargs.css
 	cp -a $< $@
 
-$(CONFIGURES): %/configure:
-	cd $(dir $@); autoreconf -iv
+cln/configure:
+	cd cln && ./autogen.sh && \
+	chmod 755 build-aux/config.*
+
+ginac/configure:
+	cd ginac && autoreconf -iv
 
 PACKAGES_STAMP := build-tree/stamps/packages.stamp
 
