@@ -39,7 +39,7 @@ export CC CXX AS LD NM AR RANLIB DLLTOOL WINDRES OBJDUMP STRIP
 # XXX: libtool cross compilation with wine works only with bash
 SHELL := /bin/bash
 CONFIG_SHELL := /bin/bash
-PATH := $(MINGW_PREFIX)/bin:/bin:/usr/bin
+PATH := $(MINGW_PREFIX)/bin:/usr/local/bin:/bin:/usr/bin
 export SHELL CONFIG_SHELL PATH
 
 # Compile for generic x86_64 CPU
