@@ -4,6 +4,9 @@ PACKAGES := gmp cln ginac
 include versions.mk
 include conf/mingw.conf
 CONFIGURES := cln/configure ginac/configure
+DESTDIR := $(shell pwd)/build-tree/inst
+TOPDIR := $(shell pwd)
+export TOPDIR
 PREFIX := /opt/$(ARCH)/ginac
 BIN_TARBALL := upload/ginac-$(ginac_VERSION)-cln-$(cln_VERSION)-gmp-$(gmp_VERSION)-$(ARCH).tar.bz2
 $(info BIN_TARBALL = $(BIN_TARBALL))
