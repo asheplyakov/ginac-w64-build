@@ -8,7 +8,7 @@ $(CONFIG_STAMP):
 
 $(BUILD_STAMP): $(CONFIG_STAMP)
 	$(MAKE) -C $(BUILDDIR) LDFLAGS="$(LDFLAGS) $(EXTRA_LDFLAGS)"
-	$(MAKE) -C $(BUILDDIR) pdf
+	if [ x$(strip $(BUILD_DOCS)) != 'xno' ]; then $(MAKE) -C $(BUILDDIR) pdf; fi
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	touch $@
 
@@ -23,7 +23,7 @@ do_extra_install := : #
 define do_install_real
 set -e ; \
 $(MAKE) -C $(BUILDDIR) install$(1) DESTDIR=$(2)$(if $(1),.stripped,) prefix=$(3) ; \
-$(MAKE) -C $(BUILDDIR) install-pdf DESTDIR=$(2)$(if $(1),.stripped,) prefix=$(3) ; \
+if [ x$(strip $(BUILD_DOCS)) != 'xno' ]; then $(MAKE) -C $(BUILDDIR) install-pdf DESTDIR=$(2)$(if $(1),.stripped,) prefix=$(3) ; fi ; \
 rm -rf $(2)$(if $(1),.stripped,)$(3)/share/info ; \
 rm -rf $(2)$(if $(1),.stripped,)$(3)/share/man ; \
 rm -rf $(2)$(if $(1),.stripped,)$(3)/info ; \

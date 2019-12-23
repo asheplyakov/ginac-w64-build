@@ -3,6 +3,7 @@
 PACKAGES := gmp cln ginac
 include versions.mk
 include conf/mingw.conf
+BUILD_DOCS ?= yes
 CONFIGURES := cln/configure ginac/configure
 DESTDIR := $(shell pwd)/build-tree/inst
 TOPDIR := $(shell pwd)
