@@ -35,20 +35,27 @@ cln/configure:
 ginac/configure:
 	cd ginac && autoreconf -iv
 
-PACKAGES_STAMP := build-tree/stamps/packages.stamp
+GINAC_STAMP := build-tree/stamps/install.ginac-$(ginac_VERSION).stamp
+CLN_STAMP := build-tree/stamps/install.cln-$(cln_VERSION).stamp
+GMP_STAMP := build-tree/stamps/install.gmp-$(gmp_VERSION).stamp
 
-$(BIN_TARBALL): $(PACKAGES_STAMP)
+PACKAGES_STAMPS := $(GINAC_STAMP) $(CLN_STAMP) $(GMP_STAMP)
+
+$(BIN_TARBALL): $(PACKAGES_STAMPS)
 	tar -cjf $@ -C $(DESTDIR) $(patsubst /%,%,$(PREFIX))
 
 $(BIN_TARBALL:%=%.md5): %.md5: %
 	md5sum $< > $@.tmp
 	mv $@.tmp $@
 
-$(PACKAGES_STAMP): $(CONFIGURES)
-	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+$(GINAC_STAMP): $(CLN_STAMP) ginac/configure
 	$(MAKE) -I `pwd`/conf -C mk/ginac PACKAGE=ginac VERSION=$(ginac_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
-	touch $@
+
+$(CLN_STAMP): $(GMP_STAMP) cln/configure
+	$(MAKE) -I `pwd`/conf -C mk/cln PACKAGE=cln VERSION=$(cln_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
+
+$(GMP_STAMP):
+	$(MAKE) -I `pwd`/conf -C mk/gmp PACKAGE=gmp VERSION=$(gmp_VERSION) PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 clean:
 	-@echo CLEAN build-tree; rm -rf build-tree
@@ -62,7 +69,13 @@ allclean:
 print_destdir:
 	@/bin/echo -n $(DESTDIR)
 
-.PHONY: packages.stamp clean all upload
+ginac: $(GINAC_STAMP)
+
+cln: $(CLN_STAMP)
+
+gmp: $(GMP_STAMP)
+
+.PHONY: packages.stamp clean all upload ginac cln gmp
 
 .NOTPARALLEL:
 
