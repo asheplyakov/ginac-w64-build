@@ -1,0 +1,7 @@
+---
+
+- name: restart systemd-binfmt
+  service:
+    name: systemd-binfmt
+    state: restarted
+  become: true

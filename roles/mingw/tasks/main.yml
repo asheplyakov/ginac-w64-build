@@ -1,0 +1,61 @@
+---
+
+- name: install MinGW64 toolchain
+  package: name={{ item }} state=present
+  with_items:
+    - binutils-mingw-w64-i686
+    - binutils-mingw-w64-x86-64
+    - gcc-mingw-w64-i686
+    - gcc-mingw-w64-x86-64
+    - g++-mingw-w64-i686
+    - g++-mingw-w64-x86-64
+    - mingw-w64-i686-dev
+    - mingw-w64-x86-64-dev
+  become: true
+
+- name: check dpkg foreign architectures
+  command: >
+    dpkg --print-foreign-architectures
+  register: dpkg_foreign_architectures
+  changed_when: False
+
+- name: add i386 foreign architecture
+  command: >
+    dpkg --add-architecture i386
+  when: "'i386' not in dpkg_foreign_architectures.stdout_lines"
+  become: true
+
+- name: import WineHQ GPG keys
+  apt_key:
+    id: D43F640145369C51D786DDEA76F1A20FF987672F
+    url: https://dl.winehq.org/wine-builds/winehq.key
+    state: present
+  become: true
+
+- name: add WineHQ stable APT repository
+  apt_repository:
+    filename: wine-stable
+    repo: "deb https://dl.winehq.org/wine-builds/ubuntu/ {{ ansible_distribution_release }} main"
+    state: present
+  become: true
+
+- name: install Wine packages
+  package: name={{ item }} state=present
+  with_items:
+    - wine-stable-i386
+    - wine-stable-amd64
+  become: true
+
+- name: configure binfmt support
+  template:
+    src: ./templates/wine.conf.j2
+    dest: /etc/binfmt.d/wine.conf
+    mode: 0644
+    owner: root
+    group: root
+  vars:
+    wine:
+      path: /opt/wine-stable/bin/wine64
+  notify:
+    - restart systemd-binfmt
+  become: true

@@ -1,0 +1,6 @@
+---
+
+- hosts:
+    - mingw
+  roles:
+    - mingw
