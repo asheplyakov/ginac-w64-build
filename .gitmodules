@@ -3,7 +3,7 @@
 	url = git://github.com/AlexeiSheplyakov/gmp.pkg.git
 [submodule "cln"]
 	path = cln
-	url = git://www.ginac.de/cln.git
+	url = git://github.com/asheplyakov/cln.git
 [submodule "ginac"]
 	path = ginac
-	url = git://www.ginac.de/ginac.git
+	url = git://github.com/asheplyakov/ginac.git
