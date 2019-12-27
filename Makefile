@@ -8,7 +8,7 @@ DESTDIR := $(shell pwd)/build-tree/inst
 TOPDIR := $(shell pwd)
 export TOPDIR
 PREFIX := /opt/$(ARCH)
-BIN_TARBALL := upload/ginac-$(ginac_VERSION)-cln-$(cln_VERSION)-gmp-$(gmp_VERSION)-$(ARCH).tar.bz2
+BIN_TARBALL := $(TOPDIR)/ginac-$(ginac_VERSION)-$(ARCH).zip
 RTFM := $(addprefix upload/,index.html vargs.css)
 MD5SUMS := $(BIN_TARBALL:%=%.md5)
 
@@ -34,7 +34,8 @@ GMP_STAMP := build-tree/stamps/install.gmp-$(gmp_VERSION).stamp
 PACKAGES_STAMPS := $(GINAC_STAMP) $(GMP_STAMP)
 
 $(BIN_TARBALL): $(PACKAGES_STAMPS)
-	tar -cjf $@ -C $(DESTDIR) $(patsubst /%,%,$(PREFIX))
+	set -e ; \
+	cd $(DESTDIR) && find $(patsubst /%,%,$(PREFIX)) -type f | zip --quiet $@ -@
 
 $(BIN_TARBALL:%=%.md5): %.md5: %
 	md5sum $< > $@.tmp
