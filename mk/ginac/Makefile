@@ -1,6 +1,5 @@
 
-CONFIGURE_ARGS :=
-CONFIGURE_ENV = env CLN_LIBS="$(CLN_LIBS)" CLN_CFLAGS="$(CLN_CFLAGS)"
-
+CONFIGURE_ARGS := -DCLN_SOURCE_DIR=$(TOPDIR)/cln
+BUILD_TOOL := cmake
 include ../common.mk
 

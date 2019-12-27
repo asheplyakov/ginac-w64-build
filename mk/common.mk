@@ -59,7 +59,7 @@ PKG_CONFIG_PATH := $(DESTDIR)$(PREFIX)/lib/pkgconfig
 # that `No working C compiler was found'. Hence we introduce EXTRA_LDFLAGS
 # and pass to `make' only (which in turn passes it to libtool).
 EXTRA_LDFLAGS :=
-include $(PACKAGE)_cflags.mk
+-include $(PACKAGE)_cflags.mk
 export CFLAGS CXXFLAGS CPPFLAGS LDFLAGS PKG_CONFIG_PATH
 
 SRCDIR := $(shell pwd)/../../$(PACKAGE)
