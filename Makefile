@@ -3,7 +3,7 @@
 PACKAGES := gmp cln ginac
 include versions.mk
 include conf/mingw.conf
-BUILD_DOCS ?= yes
+BUILD_DOCS ?= no
 DESTDIR := $(shell pwd)/build-tree/inst
 TOPDIR := $(shell pwd)
 export TOPDIR
@@ -14,6 +14,7 @@ MD5SUMS := $(BIN_TARBALL:%=%.md5)
 # FIXME: makeinfo fails due to wrong grep call in all locales except C
 LC_ALL := C
 export LC_ALL
+export BUILD_DOCS
 
 all: upload
 
