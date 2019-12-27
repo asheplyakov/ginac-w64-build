@@ -20,6 +20,6 @@ $(CHECK_STAMP): $(BUILD_STAMP)
 	touch $@
 
 $(INSTALL_STAMP): $(CHECK_STAMP)
-	$(MAKE) -C $(BUILDDIR) DESTDIR=$(DESTDIR)
+	$(MAKE) -C $(BUILDDIR) install DESTDIR=$(DESTDIR)
 	mkdir -p "$(dir $@)"
 	touch $@
