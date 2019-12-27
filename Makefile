@@ -9,7 +9,6 @@ TOPDIR := $(shell pwd)
 export TOPDIR
 PREFIX := /opt/$(ARCH)
 BIN_TARBALL := $(TOPDIR)/ginac-$(ginac_VERSION)-$(ARCH).zip
-RTFM := $(addprefix upload/,index.html vargs.css)
 MD5SUMS := $(BIN_TARBALL:%=%.md5)
 
 # FIXME: makeinfo fails due to wrong grep call in all locales except C
@@ -18,15 +17,7 @@ export LC_ALL
 
 all: upload
 
-upload: $(BIN_TARBALL) $(MD5SUMS) $(RTFM)
-
-upload/index.html: doc/readme.html.x doc/readme.py
-	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	( cd doc; ./readme.py $(ginac_VERSION) $(cln_VERSION) $(gmp_VERSION) ) > $@.tmp
-	mv $@.tmp $@
-
-upload/vargs.css: doc/vargs.css
-	cp -a $< $@
+upload: $(BIN_TARBALL) $(MD5SUMS)
 
 GINAC_STAMP := build-tree/stamps/install.ginac-$(ginac_VERSION).stamp
 GMP_STAMP := build-tree/stamps/install.gmp-$(gmp_VERSION).stamp
