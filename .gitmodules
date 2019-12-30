@@ -1,6 +1,6 @@
 [submodule "gmp"]
 	path = gmp
-	url = git://github.com/AlexeiSheplyakov/gmp.pkg.git
+	url = git://github.com/asheplyakov/gmp.pkg.git
 [submodule "cln"]
 	path = cln
 	url = git://github.com/asheplyakov/cln.git
